@@ -1,4 +1,6 @@
-﻿namespace VectorMath.Math;
+﻿using VectorMath.Math.Vector;
+
+namespace VectorMath.Math.Matrix;
 
 public class Matrix3
 {

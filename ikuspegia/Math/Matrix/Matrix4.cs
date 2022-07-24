@@ -1,4 +1,6 @@
-﻿namespace VectorMath.Math;
+﻿using VectorMath.Math.Vector;
+
+namespace VectorMath.Math.Matrix;
 
 public class Matrix4
 {
@@ -182,6 +184,38 @@ public class Matrix4
         return z * y * x;
     }
 
+    public static Matrix4 CreatePerspectiveProjection(float fov, float aspectRatio, float zNear, float zFar)
+    {
+        var tan = MathF.Tan(fov * 0.5f * MathF.PI / 180);
+
+        return new Matrix4(
+            1 / (tan * aspectRatio), 0, 0, 0,
+            0, 1 / tan, 0, 0,
+            0, 0, -zFar / (zFar - zNear), -1,
+            0, 0, -(zFar * zNear) / (zFar - zNear), 0);
+    }
+
+    public static Matrix4 CreateScreenSpaceMatrix(float width, float height)
+    {
+        return new Matrix4(
+            -0.5f * width, 0, 0, 0.5f * width,
+            0, -0.5f * height, 0, 0.5f * height,
+            0, 0, 1, 0,
+            0, 0, 0, 1);
+    }
+
+    public static Matrix4 CreateLookAtViewMatrix(Vector3 position, Vector3 lookAt, Vector3 up)
+    {
+        var z = (position - lookAt).Normalized; // The "forward" vector.
+        var x = up.Cross(z).Normalized; // The "right" vector.
+        var y = z.Cross(x); // The "up" vector.
+        return new Matrix4(
+            x.X, x.Y, x.Z, -x.Dot(position),
+            y.X, y.Y, y.Z, -y.Dot(position),
+            z.X, z.Y, z.Z, -z.Dot(position),
+            0, 0, 0, 1);
+    }
+
     public static Matrix4 operator *(Matrix4 lhs, Matrix4 rhs)
     {
         return new Matrix4(
@@ -189,14 +223,17 @@ public class Matrix4
             lhs.M11 * rhs.M12 + lhs.M12 * rhs.M22 + lhs.M13 * rhs.M32,
             lhs.M11 * rhs.M13 + lhs.M12 * rhs.M23 + lhs.M13 * rhs.M33,
             lhs.M11 * rhs.M14 + lhs.M12 * rhs.M24 + lhs.M13 * rhs.M34,
+            
             lhs.M21 * rhs.M11 + lhs.M22 * rhs.M21 + lhs.M23 * rhs.M31,
             lhs.M21 * rhs.M12 + lhs.M22 * rhs.M22 + lhs.M23 * rhs.M32,
             lhs.M21 * rhs.M13 + lhs.M22 * rhs.M23 + lhs.M23 * rhs.M33,
             lhs.M21 * rhs.M14 + lhs.M22 * rhs.M24 + lhs.M23 * rhs.M34,
+            
             lhs.M31 * rhs.M11 + lhs.M32 * rhs.M21 + lhs.M33 * rhs.M31,
             lhs.M31 * rhs.M12 + lhs.M32 * rhs.M22 + lhs.M33 * rhs.M32,
             lhs.M31 * rhs.M13 + lhs.M32 * rhs.M23 + lhs.M33 * rhs.M33,
             lhs.M31 * rhs.M14 + lhs.M32 * rhs.M24 + lhs.M33 * rhs.M34,
+            
             lhs.M41 * rhs.M11 + lhs.M42 * rhs.M21 + lhs.M43 * rhs.M31,
             lhs.M41 * rhs.M12 + lhs.M42 * rhs.M22 + lhs.M43 * rhs.M32,
             lhs.M41 * rhs.M13 + lhs.M42 * rhs.M23 + lhs.M43 * rhs.M33,

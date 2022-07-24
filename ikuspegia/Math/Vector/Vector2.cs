@@ -1,4 +1,4 @@
-﻿namespace VectorMath.Math;
+﻿namespace VectorMath.Math.Vector;
 
 public class Vector2
 {
